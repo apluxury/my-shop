@@ -5,6 +5,7 @@ import store from './store'
 //element 配置
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
+import './assets/fonts/iconfont.css'
 //引入公共样式
 import './assets/css/global.css'
 Vue.config.productionTip = false
