@@ -20,8 +20,6 @@ export  const  login_api=(params)=>{
 export const  menus_api=(params)=>{
     return  axios.get("menus",params)
 }
-
-
 /* 获取用户列表 */
 export const  users_api=(params)=>{
     return  axios.get("users",{params});
