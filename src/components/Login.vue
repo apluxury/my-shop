@@ -1,5 +1,6 @@
 <template>
   <div class="login_container">
+<<<<<<< HEAD
     <div class="login_box">
       <!-- 头像区域 -->
       <div class="avatar_box">
@@ -29,6 +30,28 @@
         <el-form-item class="btns">
           <el-button type="primary" @click="submitForm">登录</el-button>
           <el-button type="info" @click="reset">重置</el-button>
+=======
+    <!-- 登录盒子  -->
+    <div class="login_box">
+      <!-- 头像 -->
+      <div class="avatar_box">
+        <img src="../assets/logo.png" alt />
+      </div>
+      <!-- 登录表单 -->
+      <el-form class="login_form">
+        <!-- 用户名 -->
+        <el-form-item>
+          <el-input prefix-icon="iconfont icon-user"></el-input>
+        </el-form-item>
+        <!-- 密码 -->
+        <el-form-item prop="password">
+          <el-input type="password" prefix-icon="iconfont icon-3702mima"></el-input>
+        </el-form-item>
+        <!-- 按钮 -->
+        <el-form-item class="btns">
+          <el-button type="primary">登录</el-button>
+          <el-button type="info">重置</el-button>
+>>>>>>> a209ec96951ec63518ae43ab0d46a5b0f0e07e3f
         </el-form-item>
       </el-form>
     </div>
@@ -36,6 +59,7 @@
 </template>
 
 <script>
+<<<<<<< HEAD
 import  {login_api} from  "@/api"
 export default {
   data() {
@@ -108,12 +132,29 @@ p {
   width: 450px;
   height: 300px;
   background-color: #fff;
+=======
+export default {};
+</script>
+
+<style lang="less" scoped>
+.login_container {
+  background-color: pink;
+  height: 100%;
+}
+.login_box {
+  width: 450px;
+  height: 300px;
+  background: #fff;
+>>>>>>> a209ec96951ec63518ae43ab0d46a5b0f0e07e3f
   border-radius: 3px;
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
+<<<<<<< HEAD
 
+=======
+>>>>>>> a209ec96951ec63518ae43ab0d46a5b0f0e07e3f
   .avatar_box {
     height: 130px;
     width: 130px;
@@ -133,7 +174,10 @@ p {
     }
   }
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> a209ec96951ec63518ae43ab0d46a5b0f0e07e3f
 .login_form {
   position: absolute;
   bottom: 0;
@@ -141,9 +185,16 @@ p {
   padding: 0 20px;
   box-sizing: border-box;
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> a209ec96951ec63518ae43ab0d46a5b0f0e07e3f
 .btns {
   display: flex;
   justify-content: flex-end;
 }
+<<<<<<< HEAD
 </style>
+=======
+</style>
+>>>>>>> a209ec96951ec63518ae43ab0d46a5b0f0e07e3f

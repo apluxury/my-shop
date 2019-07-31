@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+<<<<<<< HEAD
     
    app.vue22222
 
@@ -25,4 +26,17 @@
     }
   }
 }
+=======
+    <router-view />
+  </div>
+</template>
+
+<style>
+>>>>>>> a209ec96951ec63518ae43ab0d46a5b0f0e07e3f
 </style>
+
+<script>
+export default {
+  name: "app"
+};
+</script>

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /* 全局样式表 */
 html,
 body,
@@ -25,3 +26,11 @@ body,
 .el-pagination {
   margin-top: 15px;
 }
+=======
+html,body,#app{
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0; 
+}
+>>>>>>> a209ec96951ec63518ae43ab0d46a5b0f0e07e3f
