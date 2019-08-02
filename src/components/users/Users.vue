@@ -37,9 +37,14 @@
       <el-table-column prop="address" label="操作">
         <template slot-scope="scope">
           <!-- 修改按钮 -->
-          <el-button type="primary" icon="el-icon-edit" size="mini" @click="editUser(scope.row.id)"></el-button>
+          <el-button
+            type="primary"
+            icon="el-icon-edit"
+            size="mini"
+            @click="showeditialogVisible(scope.row)"
+          ></el-button>
           <!-- 删除按钮 -->
-          <el-button type="danger" icon="el-icon-delete" size="mini"></el-button>
+          <el-button type="danger" icon="el-icon-delete" size="mini" @click="del(scope.row)"></el-button>
           <!-- 分配角色按钮 -->
           <el-tooltip effect="dark" content="分配角色" placement="top" :enterable="false">
             <el-button type="warning" icon="el-icon-setting" size="mini"></el-button>
@@ -70,8 +75,8 @@
         <el-form-item label="邮箱" prop="email">
           <el-input v-model="addruleForm.email"></el-input>
         </el-form-item>
-        <el-form-item label="手机" prop="phone">
-          <el-input v-model="addruleForm.phone"></el-input>
+        <el-form-item label="手机" prop="mobile">
+          <el-input v-model="addruleForm.mobile"></el-input>
         </el-form-item>
       </el-form>
       <!-- 底部区域 -->
@@ -85,14 +90,14 @@
     <el-dialog title="修改用户" :visible.sync="editialogVisible" width="50%" @close="editFormClose">
       <!-- 主体区域 -->
       <el-form :model="editruleForm" :rules="editFormrules" ref="editFormRef" label-width="70px">
-        <el-form-item label="用户名" prop="username">
-          <el-input v-model="editruleForm.username"></el-input>
+        <el-form-item label="用户名">
+          <el-input v-model="editruleForm.username" disabled></el-input>
         </el-form-item>
         <el-form-item label="邮箱" prop="email">
           <el-input v-model="editruleForm.email"></el-input>
         </el-form-item>
-        <el-form-item label="手机" prop="phone">
-          <el-input v-model="editruleForm.phone"></el-input>
+        <el-form-item label="手机" prop="mobile">
+          <el-input v-model="editruleForm.mobile"></el-input>
         </el-form-item>
       </el-form>
       <!-- 底部区域 -->
@@ -109,7 +114,9 @@ import {
   users_api,
   usersStateChange_api,
   adduser_api,
-  editgetbyid_api
+  editgetbyid_api,
+  edituser_api,
+  deluser_api
 } from "@/api";
 export default {
   data() {
@@ -122,9 +129,9 @@ export default {
       return cd(new Error("请输入合法邮箱"));
     };
     // 验证手机
-    var checkphone = (rule, value, cd) => {
-      const chphone = /^1([38]\d|5[0-35-9]|7[3678])\d{8}$/;
-      if (chphone.test(value)) {
+    var checkmobile = (rule, value, cd) => {
+      const chmobile = /^1([38]\d|5[0-35-9]|7[3678])\d{8}$/;
+      if (chmobile.test(value)) {
         return cd();
       }
       return cd(new Error("请输入合法手机号"));
@@ -144,7 +151,7 @@ export default {
         username: "",
         password: "",
         email: "",
-        phone: ""
+        mobile: ""
       },
       addFormrules: {
         username: [
@@ -159,24 +166,25 @@ export default {
           { required: true, message: "请输入邮箱", trigger: "blur" },
           { validator: checkemail, trigger: "blur" }
         ],
-        phone: [
+        mobile: [
           { required: true, message: "请输入手机", trigger: "blur" },
-          { validator: checkphone, trigger: "blur" }
+          { validator: checkmobile, trigger: "blur" }
         ]
       },
       editruleForm: {
+        id: "",
         username: "",
         email: "",
-        phone: ""
+        mobile: ""
       },
       editFormrules: {
         email: [
           { required: true, message: "请输入邮箱", trigger: "blur" },
           { validator: checkemail, trigger: "blur" }
         ],
-        phone: [
+        mobile: [
           { required: true, message: "请输入手机", trigger: "blur" },
-          { validator: checkphone, trigger: "blur" }
+          { validator: checkmobile, trigger: "blur" }
         ]
       }
     };
@@ -238,15 +246,50 @@ export default {
         this.getUsersList();
       });
     },
-    // 编辑用户
-    async editUser(id) {
+    async showeditialogVisible(id) {
+      this.editialogVisible = true;
       const { data: res } = await editgetbyid_api(id);
       if (res.meta.status !== 200) return this.$message.error("查找用户失败");
-      this.editruleForm = this.data;
-      this.editialogVisible = true;
+      this.editruleForm = res.data;
+    },
+    // 编辑用户
+    editUser() {
+      this.$refs.editFormRef.validate(async valid => {
+        if (!valid) return this.message.error("请输入完整信息");
+        const { data: res } = await edituser_api(this.editruleForm);
+        if (res.meta.status !== 200) {
+          return this.$message.error("添加失败");
+        }
+        this.$message.success("添加成功");
+        // 关闭表单
+        this.editialogVisible = false;
+        // 刷新页面
+        this.getUsersList();
+      });
     },
     editFormClose() {
       this.$refs.editFormRef.resetFields();
+    },
+    // 根据用户id删除用户
+    async del(id) {
+      const deldata = await this.$confirm(
+        "此操作将永久删除该用户, 是否继续?",
+        "提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }
+      ).catch(err => err);
+      if (deldata !== "confirm") {
+        return this.$message.info("已取消删除");
+      }
+      const { data: res } = await deluser_api(id);
+      if (res.meta.status !== 200) {
+        return this.message.error("删除失败");
+      }
+      this.$message.success("删除成功");
+      this.getUsersList();
     }
   }
 };
