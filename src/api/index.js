@@ -28,6 +28,15 @@ export const users_api = (params) => {
 export const usersStateChange_api = (params) => {
     return axios.put(`users/${params.uId}/state/${params.type}`);
 }
+/* 添加用户 */ 
+export const adduser_api = (params) => {
+    return axios.post("users",params);
+}
+/* 根据用户id查询用户 */ 
+export const  editgetbyid_api = (params) => {
+    return axios.get(`users/${params.id}`);
+}
+
 
 
 

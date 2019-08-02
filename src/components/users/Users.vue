@@ -16,7 +16,7 @@
           </el-input>
         </el-col>
         <el-col :span="4">
-          <el-button type="primary" @click="open3">添加用户</el-button>
+          <el-button type="primary" @click="addialogVisible = true">添加用户</el-button>
         </el-col>
       </el-row>
     </el-card>
@@ -37,7 +37,7 @@
       <el-table-column prop="address" label="操作">
         <template slot-scope="scope">
           <!-- 修改按钮 -->
-          <el-button type="primary" icon="el-icon-edit" size="mini"></el-button>
+          <el-button type="primary" icon="el-icon-edit" size="mini" @click="editUser(scope.row.id)"></el-button>
           <!-- 删除按钮 -->
           <el-button type="danger" icon="el-icon-delete" size="mini"></el-button>
           <!-- 分配角色按钮 -->
@@ -57,19 +57,81 @@
       layout="total, sizes, prev, pager, next, jumper"
       :total="total"
     ></el-pagination>
-    <template>
-      <el-button type="text" @click="open3">点击打开 Message Box</el-button>
-    </template>
-  </div>
-</template>
+    <!-- 添加弹出框 -->
+    <el-dialog title="添加用户" :visible.sync="addialogVisible" width="50%" @close="addFormClose">
+      <!-- 主体区域 -->
+      <el-form :model="addruleForm" :rules="addFormrules" ref="addFormRef" label-width="70px">
+        <el-form-item label="用户名" prop="username">
+          <el-input v-model="addruleForm.username"></el-input>
+        </el-form-item>
+        <el-form-item label="密码" prop="password">
+          <el-input v-model="addruleForm.password"></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱" prop="email">
+          <el-input v-model="addruleForm.email"></el-input>
+        </el-form-item>
+        <el-form-item label="手机" prop="phone">
+          <el-input v-model="addruleForm.phone"></el-input>
+        </el-form-item>
+      </el-form>
+      <!-- 底部区域 -->
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="addialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="addUser">确 定</el-button>
+      </span>
+    </el-dialog>
+
+    <!-- 修改弹出框 -->
+    <el-dialog title="修改用户" :visible.sync="editialogVisible" width="50%" @close="editFormClose">
+      <!-- 主体区域 -->
+      <el-form :model="editruleForm" :rules="editFormrules" ref="editFormRef" label-width="70px">
+        <el-form-item label="用户名" prop="username">
+          <el-input v-model="editruleForm.username"></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱" prop="email">
+          <el-input v-model="editruleForm.email"></el-input>
+        </el-form-item>
+        <el-form-item label="手机" prop="phone">
+          <el-input v-model="editruleForm.phone"></el-input>
+        </el-form-item>
+      </el-form>
+      <!-- 底部区域 -->
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="editialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="editUser">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
            
 <script>
-import { users_api, usersStateChange_api } from "@/api";
+import {
+  users_api,
+  usersStateChange_api,
+  adduser_api,
+  editgetbyid_api
+} from "@/api";
 export default {
   data() {
+    // 验证邮箱
+    var checkemail = (rule, value, cd) => {
+      const chemail = /[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?/;
+      if (chemail.test(value)) {
+        return cd();
+      }
+      return cd(new Error("请输入合法邮箱"));
+    };
+    // 验证手机
+    var checkphone = (rule, value, cd) => {
+      const chphone = /^1([38]\d|5[0-35-9]|7[3678])\d{8}$/;
+      if (chphone.test(value)) {
+        return cd();
+      }
+      return cd(new Error("请输入合法手机号"));
+    };
     return {
+      editialogVisible: false,
+      addialogVisible: false,
       value2: false,
       queryInfo: {
         query: "",
@@ -77,7 +139,46 @@ export default {
         pagesize: 3
       },
       tableData2: [],
-      total: 0
+      total: 0,
+      addruleForm: {
+        username: "",
+        password: "",
+        email: "",
+        phone: ""
+      },
+      addFormrules: {
+        username: [
+          { required: true, message: "请输入用户名", trigger: "blur" },
+          { min: 3, max: 10, message: "长度在 3 到 10 个字符", trigger: "blur" }
+        ],
+        password: [
+          { required: true, message: "请输入密码", trigger: "blur" },
+          { min: 6, max: 15, message: "长度在 6 到 15 个字符", trigger: "blur" }
+        ],
+        email: [
+          { required: true, message: "请输入邮箱", trigger: "blur" },
+          { validator: checkemail, trigger: "blur" }
+        ],
+        phone: [
+          { required: true, message: "请输入手机", trigger: "blur" },
+          { validator: checkphone, trigger: "blur" }
+        ]
+      },
+      editruleForm: {
+        username: "",
+        email: "",
+        phone: ""
+      },
+      editFormrules: {
+        email: [
+          { required: true, message: "请输入邮箱", trigger: "blur" },
+          { validator: checkemail, trigger: "blur" }
+        ],
+        phone: [
+          { required: true, message: "请输入手机", trigger: "blur" },
+          { validator: checkphone, trigger: "blur" }
+        ]
+      }
     };
   },
   created() {
@@ -88,7 +189,6 @@ export default {
       const { data: res } = await users_api(this.queryInfo);
       if (res.meta.status !== 200)
         return this.$message.error("获取用户数据列表失败");
-
       this.$message({
         message: "恭喜你，这是一条成功消息",
         type: "success"
@@ -119,25 +219,34 @@ export default {
       }
       this.$message.success("更新状态成功");
     },
-    open3() {
-      this.$prompt("请输入邮箱", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        inputPattern: /[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?/,
-        inputErrorMessage: "邮箱格式不正确"
-      })
-        .then(({ value }) => {
-          this.$message({
-            type: "success",
-            message: "你的邮箱是: " + value
-          });
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "取消输入"
-          });
-        });
+    //添加表单关闭重置事件
+    addFormClose() {
+      this.$refs.addFormRef.resetFields();
+    },
+    // 添加用户
+    addUser() {
+      this.$refs.addFormRef.validate(async valid => {
+        if (!valid) return this.message.error("请输入完整信息");
+        const { data: res } = await adduser_api(this.addruleForm);
+        if (res.meta.status !== 201) {
+          return this.$message.error("添加失败");
+        }
+        this.$message.success("添加成功");
+        // 关闭表单
+        this.addialogVisible = false;
+        // 刷新页面
+        this.getUsersList();
+      });
+    },
+    // 编辑用户
+    async editUser(id) {
+      const { data: res } = await editgetbyid_api(id);
+      if (res.meta.status !== 200) return this.$message.error("查找用户失败");
+      this.editruleForm = this.data;
+      this.editialogVisible = true;
+    },
+    editFormClose() {
+      this.$refs.editFormRef.resetFields();
     }
   }
 };
