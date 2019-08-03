@@ -44,6 +44,27 @@ export const edituser_api = (params) => {
 export const deluser_api = (params) => {
     return axios.delete(`users/${params.id}`);
 }
+/* 渲染权限列表 */
+export const rigths_api = () => {
+    return axios.get(`rights/list`);
+}
+/* 渲染权限列表 */
+export const roles_api = (params) => {
+    return axios.get(`roles`, params);
+}
+/* 删除权限byid列表 */
+export const rolesdelete_api = (roleId, rightId) => {
+    return axios.delete(`roles/${roleId}/rights/${rightId}`);
+}
+/* 渲染权限tree列表 */
+export const rigthstree_api = () => {
+    return axios.get(`rights/tree`);
+}
+/* 角色授权 */
+export const rigthsroleid_api = (roleid, idStr) => {
+    return axios.post(`roles/${roleid}/rights `, idStr);
+}
+
 
 
 
