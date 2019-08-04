@@ -64,18 +64,12 @@ export const rigthstree_api = () => {
 export const rigthsroleid_api = (roleid, idStr) => {
     return axios.post(`roles/${roleid}/rights `, idStr);
 }
+/* 根据用户id权限查询用户 */
+export const allocationroleplay_api = (params) => {
+    return axios.get('roles', params.id)
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/* 确认用户角色修改 */
+export const sevesplay_api = (id, idStr) => {
+    return axios.put(`users/${id}/role`, { rid: idStr });
+}

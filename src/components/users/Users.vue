@@ -47,7 +47,12 @@
           <el-button type="danger" icon="el-icon-delete" size="mini" @click="del(scope.row)"></el-button>
           <!-- 分配角色按钮 -->
           <el-tooltip effect="dark" content="分配角色" placement="top" :enterable="false">
-            <el-button type="warning" icon="el-icon-setting" size="mini"></el-button>
+            <el-button
+              type="warning"
+              icon="el-icon-setting"
+              size="mini"
+              @click="allocationroleplay(scope.row)"
+            ></el-button>
           </el-tooltip>
         </template>
       </el-table-column>
@@ -106,6 +111,26 @@
         <el-button type="primary" @click="editUser">确 定</el-button>
       </span>
     </el-dialog>
+    <!-- 分配角色 -->
+    <el-dialog title="分配角色" :visible.sync="allocationrole" width="50%">
+      <p>当前的用户:{{userinfo.username}}</p>
+      <p>当前的角色:{{userinfo.role_name}}</p>
+      <p>
+        分配新角色:
+        <el-select v-model="selectedRoleId" placeholder="请选择">
+          <el-option
+            v-for="item in allocationroleForm"
+            :key="item.id"
+            :label="item.roleName"
+            :value="item.id"
+          ></el-option>
+        </el-select>
+      </p>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="allocationrole = false">取 消</el-button>
+        <el-button type="primary" @click="seaveplayer">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
            
@@ -116,7 +141,9 @@ import {
   adduser_api,
   editgetbyid_api,
   edituser_api,
-  deluser_api
+  deluser_api,
+  allocationroleplay_api,
+  sevesplay_api
 } from "@/api";
 export default {
   data() {
@@ -137,6 +164,8 @@ export default {
       return cd(new Error("请输入合法手机号"));
     };
     return {
+      selectedRoleId: "",
+      allocationrole: false,
       editialogVisible: false,
       addialogVisible: false,
       value2: false,
@@ -186,7 +215,9 @@ export default {
           { required: true, message: "请输入手机", trigger: "blur" },
           { validator: checkmobile, trigger: "blur" }
         ]
-      }
+      },
+      allocationroleForm: [],
+      userinfo: {}
     };
   },
   created() {
@@ -290,6 +321,26 @@ export default {
       }
       this.$message.success("删除成功");
       this.getUsersList();
+    },
+    async allocationroleplay(row) {
+      this.userinfo = row;
+      const { data: res } = await allocationroleplay_api(row);
+      if (res.meta.status !== 200) return this.$message.error("获取权限失败");
+      this.allocationroleForm = res.data;
+      console.log(this.allocationroleForm);
+      this.allocationrole = true;
+    },
+    async seaveplayer() {
+      const { data: res } = await sevesplay_api(
+        this.userinfo.id,
+        this.selectedRoleId
+      );
+      if (res.meta.status !== 200) return this.$message.error("修改权限失败");
+      this.$message.success("修改权限成功");
+      this.getUsersList();
+      this.allocationrole = false;
+      this.selectedRoleId = "";
+      this.userinfo = {};
     }
   }
 };
