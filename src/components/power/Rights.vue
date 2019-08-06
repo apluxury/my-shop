@@ -8,7 +8,7 @@
     </el-breadcrumb>
 
     <!-- 卡片视图 -->
-    <el-card>
+    <el-card>=
       <el-table :data="rigthslist" stripe border>
         <el-table-column type="index"></el-table-column>
         <el-table-column prop="authName" label="权限名称"></el-table-column>

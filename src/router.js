@@ -5,12 +5,16 @@ import Router from 'vue-router'
 import Login from "@/components/Login";
 import Home from "@/components/Home";
 import Welcome from "@/components/Welcome";
+import TreeTable from 'vue-table-with-tree-grid'
 
 /* 用户 */
 import Users from "@/components/users/Users";
 import Rights from "@/components/power/Rights";
 import Roles from "@/components/power/Roles";
+import Cate from "@/components/goods/Cate";
 Vue.use(Router)
+Vue.config.productionTip = false
+Vue.component('tree-table', TreeTable)
 
 const router = new Router({
     routes: [
@@ -23,6 +27,7 @@ const router = new Router({
                 { path: "/users", component: Users },
                 { path: "/rights", component: Rights },
                 { path: "/roles", component: Roles },
+                { path: "/categories", component: Cate }
             ]
         },
     ]

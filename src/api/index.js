@@ -73,3 +73,8 @@ export const allocationroleplay_api = (params) => {
 export const sevesplay_api = (id, idStr) => {
     return axios.put(`users/${id}/role`, { rid: idStr });
 }
+/* 商品分类页渲染 */
+export const catelist_api = (params) => {
+    return axios.get('categories', {params});
+}
+
