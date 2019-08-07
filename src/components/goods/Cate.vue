@@ -61,12 +61,7 @@
     </el-card>
 
     <!-- 添加分类的对话框 -->
-    <el-dialog
-      title="添加分类"
-      :visible.sync="addCateDialogVisible"
-      width="50%"
-      @close="addCateDialogClosed"
-    >
+    <el-dialog title="添加分类" :visible.sync="showadd" width="50%" @close="addCateDialogClosed">
       <!-- 添加分类的表单 -->
       <el-form
         :model="addCateForm"
@@ -92,22 +87,24 @@
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="addCateDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="addCate">确 定</el-button>
+        <el-button @click="showadd = false">取 消</el-button>
+        <el-button type="primary" @click="resaddcate">确 定</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { catelist_api } from "@/api";
+import { catelist_api, addcatelist_api, addcate_api } from "@/api";
 export default {
   data() {
     return {
       selectedKeys: [],
       parentCateList: [],
       addCateForm: {
-        cat_name: ""
+        cat_name: "",
+        cat_pid: 0,
+        cat_level: 0
       },
       addCateFormRules: {
         username: [
@@ -116,7 +113,7 @@ export default {
         ]
       },
       // 控制添加分类对话框的显示与隐藏
-      addCateDialogVisible: false,
+      showadd: false,
       total: 0,
       querInfo: {
         type: 3,
@@ -180,9 +177,47 @@ export default {
       this.querInfo.pagenum = newPage;
       this.getcateList();
     },
-    addcate() {},
-    addCateDialogClosed() {},
-    parentCateChanged() {}
+    async addcate() {
+      const { data: res } = await addcatelist_api();
+      this.parentCateList = res.data;
+      this.showadd = true;
+    },
+    parentCateChanged() {
+      console.log(this.selectedKeys);
+      // 如果 selectedKeys 数组中的 length 大于0，证明选中的父级分类
+      // 反之，就说明没有选中任何父级分类
+      if (this.selectedKeys.length > 0) {
+        // 父级分类的Id
+        this.addCateForm.cat_pid = this.selectedKeys[
+          this.selectedKeys.length - 1
+        ];
+        // 为当前分类的等级赋值
+        this.addCateForm.cat_level = this.selectedKeys.length;
+      } else {
+        // 父级分类的Id
+        this.addCateForm.cat_pid = 0;
+        // 为当前分类的等级赋值
+        this.addCateForm.cat_level = 0;
+      }
+    },
+    resaddcate() {
+      this.$refs.addCateFormRef.validate(async valid => {
+        if (!valid) return;
+        const { data: res } = await addcate_api("categories", this.addCateForm);
+        if (res.meta.status !== 201) {
+          return this.$message.error("添加分类失败！");
+        }
+        this.$message.success("添加分类成功！");
+        this.getCateList();
+        this.addCateDialogVisible = false;
+      });
+    },
+    addCateDialogClosed() {
+      this.$refs.addCateFormRef.resetFields();
+      this.selectedKeys = [];
+      this.addCateForm.cat_level = 0;
+      this.addCateForm.cat_pid = 0;
+    }
   }
 };
 </script>

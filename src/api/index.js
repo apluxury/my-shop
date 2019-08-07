@@ -75,6 +75,14 @@ export const sevesplay_api = (id, idStr) => {
 }
 /* 商品分类页渲染 */
 export const catelist_api = (params) => {
-    return axios.get('categories', {params});
+    return axios.get('categories', { params });
+}
+/* 商品分类页添加父级渲染 */
+export const addcatelist_api = () => {
+    return axios.get('categories', { params: { type: 2 } });
+}
+/* 商品分类页添加请求 */
+export const addcate_api = (params) => {
+    return axios.post('categories', params);
 }
 
